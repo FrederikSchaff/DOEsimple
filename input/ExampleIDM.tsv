@@ -1,0 +1,13 @@
+Parameter	Minimum	Maximum	Increment	Type	Comment
+k_StrategiesPerAgent	0.0	1.0	.01	LHD	The relative number of strategies per agent. 0 corresponds to 1 strategy, 1 to all strategies
+K_StrategySpace	0	1	0.2	Factorial	The relative size of the strategy-space. 0 corresponds to 1 strategy, 1 to all possible strategies
+l_Lambda	0.1	0.9	0.4	Fixed	Fixed to min+incr, here: 0.5
+m_Memory	5	20	1	LHD	The maximum memory length in days (integer)
+n_Agents	10	100000	10	FactPower	A random integer value in [10,10000], selected via Latin Hyper Cube Design
+p_Crowded	0.2	0.8	0.05	LHD	THe target rate of crowdance
+s_Seed	1	2147483647	1	Random	A random integer value in [1,2147483647], selected randomly (not LHD)
+ABMAT_Max_t	1000	1000	0	Fixed	The number of days we run the simulation
+ABMAT_SeqMC_BCc	20	20	0	Fixed	The Besag-Clifford constant for the sequential Monte Carlo analysis
+ABMAT_SeqMC_Pv	0.05	0.05	0	Fixed	The P-Value for the sequential Monte Carlo analysis
+ABMAT_SeqMC_seed	1	2147483647	1	Random	The seed that is used for the sequential Monte Carlo analysis
+ABMAT_Window	300	300	0	Fixed	The size of the window that is covered for the stats and for the sequential Monte Carlo analysis
