@@ -175,8 +175,8 @@ def DOE(DOE_Seed,LHD_SampleSize,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs):
                 LHD_DPM[row][LHD_col]*=(IDM[col][2]-IDM[col][1]) #spannwidth
                 LHD_DPM[row][LHD_col]+=IDM[col][1] #add minimum
                 #Now, correct to step-size
-                LHD_DPM[row][LHD_col]=round(LHD_DPM[row][LHD_col]*IDM[col][3])
-                LHD_DPM[row][LHD_col]/=IDM[col][3]
+                LHD_DPM[row][LHD_col]=round(LHD_DPM[row][LHD_col]/IDM[col][3])
+                LHD_DPM[row][LHD_col]*=IDM[col][3]
                 LHD_col+=1                          
     
     #Provide a "Header" for the DPM with Parameter Names and ConfigID    
