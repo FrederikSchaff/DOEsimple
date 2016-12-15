@@ -264,7 +264,7 @@ def main(argv):
 
     #Get the arguments    
     try:
-        opts, args = getopt.getopt(argv,"n:s:f:i:o:O:")
+        opts, args = getopt.getopt(argv,"n:s:f:F:i:o:O:r:")
     except getopt.GetoptError:
         print(usage)
         os.sys.exit(2)
