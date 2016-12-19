@@ -223,7 +223,7 @@ def DOE(DOE_Seed,LHD_SampleSize,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs):
     #with the factorial's values. E.g. scale parameters.
     if (RandomiseCFGs == "Yes"):
         np.random.shuffle(DPM)
-        for row in range(LHD_SampleSize):
+        for row in range(SampleSize):
             DPM[row][0]=row+1
 
         
