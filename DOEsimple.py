@@ -264,11 +264,15 @@ def main(argv):
 
     #Get the arguments    
     try:
-        opts, args = getopt.getopt(argv,"n:s:f:F:i:o:O:r:")
+        opts, args = getopt.getopt(argv,"h:n:s:f:F:i:o:O:r:")
     except getopt.GetoptError:
-        print(usage)
+        print("\nERROR ERROR ERROR\n \t check arguments.\nERROR ERROR ERROR\n")
+        #print(usage)
         os.sys.exit(2)
     for opt, arg in opts:
+        if opt in ("-h"):
+            print(usage)
+            os.sys.exit(2)
         if opt in ("-s"):
             DOE_Seed = int(arg)
         elif opt in ("-n"):
