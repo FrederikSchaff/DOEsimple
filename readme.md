@@ -5,10 +5,8 @@ Matrix (DPM), potentially mixed from latin hyper cube, simple randomisation
 fixed values. For latin hyper cube designs the [PyDOE](https://github.com/tisimst/pyDOE) library
 is used.
 
-For the latin hyper cube, if a small sample size is given, the maximum pair-
-wise correlation is minised. If a larger sample is given, the distribution is
-such that the minimum distance between points is maximised AND the points are
-centered within intervals
+For the latin hyper cube, the optimisation approach can be specified (deault: correlation), 
+alongside with the number of iterations. See [PyDOE](https://github.com/tisimst/pyDOE) for more information.
 
 ##Usage
 You can call the program via command line, using the following arguments, the 
@@ -16,7 +14,11 @@ defaults are specified in [].
 
 -n: [10] LHD Sample Size (total). Sample Size is n*{} {Size of Factorial Design}
 
--i: [10] Number of iterations for the LHD 
+-N: LHD Sample Size, alternatively provided as a multiple of LHD factors (rounded
+
+-l: The kind of optimisation for the lhs (default: corr). Alternatives: c,m,cm or none 
+
+-i: [10] Number of iterations for the LHD optimisation 
 
 -s: [42] initial seed for the DOE generation within python
 
@@ -70,6 +72,7 @@ ABMAT_ConfigID | Par1 | Par2  | Par3
 2 |   .2 | .2e-3 |  0.1
 3 |   .4 | .2    |  9.9
 
+**An example *.batch file for Windows clients (python 3 installed) is attached.**
 
 ##Workings:
 Simple Random Values are drawn new each time for each configuration.

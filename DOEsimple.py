@@ -4,7 +4,7 @@ Created on 02.11.2016 17:52:18
 
 @author: Frederik.Schaff@FernUni-Hagen.de
 
-A "simple" Python file to create a Design of Experiment (DOE) Design Point 
+A "simple" Python script to create a Design of Experiment (DOE) Design Point 
 Matrix (DPM), potentially mixed from latin hyper cube, simple randomisation 
 (appropriate for seeds, e.g.) and factorial designs + fixed values.
 
@@ -17,7 +17,11 @@ USAGE = """ \
     
     All the information regarding parameters for the DOE design is provided as
     optional arguments with the command line. Default in []
-    -n: [10] LHD Sample Size (total). Sample Size is n*{} {Size of Factorial Design}
+    -n: [10] LHD Sample Size (total, integer). Alternatively:
+    -N: [1] LHD Sample Size equal to multiple of factors (rounded)
+             Note: Sample Size is n*{} {Size of Factorial Design}
+    -l: The kind of optimisation for the lhs (default: corr). 
+        Alternatives: c,m,cm or none
     -i: [10] Number of iterations for the LHD 
     -s: [42] initial seed for the DOE generation within python
     -f: Input Design Matrix, see below (tab separeted file) - Full Path
@@ -34,19 +38,19 @@ All the information regarding the factors ("Parameters") is provided in a
     An example is given with "ExampleIDM.tsv"
     
 The file follows the following structure (headers needed):
-+-----------+---------+------------+-----------+--------------+
-| Parameter | Minimum |  Maximum   | Increment |   Type       |
-+-----------+---------+------------+-----------+--------------+
-| n_Agents  |      10 |      10000 |         1 | LHD          | [1]   
-| p_crowded |    0.01 |        .99 |       0.2 | Factorial    | [2]    
-| seed      |       1 | 2147483647 |         1 | Random       | [3]    
-| Lambda    |     0.1 |        0.9 |       0.4 | Fixed        | [4]
-| beta      |      10 |      10000 |        10 | FactPower    | [5]
-+-----------+---------+------------+-----------+--------------+
++-----------+---------+------------+-----------+--------------+--------------+
+| Parameter | Minimum |  Maximum   | Increment |   Type       | Comment      |
++-----------+---------+------------+-----------+--------------+--------------+
+| n_Agents  |      10 |      10000 |         1 | LHD          | [1]          |
+| p_crowded |    0.01 |        .99 |       0.2 | Factorial    | [2]          |
+| seed      |       1 | 2147483647 |         1 | Random       | [3]          |
+| Lambda    |     0.1 |        0.9 |       0.4 | Fixed        | [4]          |
+| beta      |      10 |      10000 |        10 | FactPower    | [5]          |
++-----------+---------+------------+-----------+--------------+--------------+
 
 Comments:
     [1] A random integer value in [10,10000], selected via Latin Hyper Cube D.
-    [2] Factorial design, {0.01,0.21,0.41,...,0.91}                                
+    [2] Factorial design, {0.01,0.21,0.41,...,0.91}                           
     [3] A random integer value in [1,2147483647], selected randomly (not LHD)
     [4] Fixed to min+incr, here: 0.5
     [5] Factorial design, increment by powers of "Increment". In example:
@@ -89,7 +93,7 @@ import pyDOE #http://pythonhosted.org/pyDOE/randomized.html
 import csv as csv # to load the input file.
 
 
-def DOE(DOE_Seed,LHD_SampleSize,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs):
+def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs):
     np.random.seed(DOE_Seed) #fix
 
     print("STARTING\n")
@@ -131,16 +135,21 @@ def DOE(DOE_Seed,LHD_SampleSize,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs):
                 pw+=1
             Factorials.append( [IDM[row][0], np.asarray(tmp)] ) #parname, #items                
 
+    #Calculate the size of the LHD sample part
+    if LHD_SampleSize < 0:
+        LHD_SampleSize*=-LHD_factors
+        LHD_SampleSize = round(LHD_SampleSize)
+        
     #Calculate the size of the overal sample
-    FactSampleSize=1
+    FactSampleSize=1    
     for item in range(len(Factorials)):
         FactSampleSize*=Factorials[item][1].size
     SampleSize =  int(LHD_SampleSize*FactSampleSize)   
-    print ("Factorial design with ",len(Factorials), " Factors and ", \
-            FactSampleSize, "Configurations.\n")
+    print ("Factorial design with ",len(Factorials), " factors and ", \
+            FactSampleSize, "configurations.\n")
     print ("Latin Hyper Cube design with ", LHD_factors, " Factors and ",\
-           LHD_SampleSize, " Design Points for each\n")
-    print("Overal Sample Size is: ", SampleSize)
+           LHD_SampleSize, " distinct design points for each\n")
+    print("Overal sample size is: ", SampleSize)
 
     #Create a reduced form design point matrix of the factorial factors.
     Fact_DPM = np.empty([FactSampleSize,len(Factorials)],"float64")
@@ -157,16 +166,22 @@ def DOE(DOE_Seed,LHD_SampleSize,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs):
         loops*=Factorials[col][1].size #increase the number of repeated vals
                 
     #select sampling method for LHD part
-    LHD_SamplingStrategy='corr'
-    if LHD_SampleSize/LHD_factors > 30:
-        LHD_SamplingStrategy='centermaximin'
-        LHD_iterations = int( max(2,np.floor(LHD_iterations/10)))
-    print ("Using strategy " + LHD_SamplingStrategy + " for the LHS with " \
-        + str(LHD_iterations) + " iterations \n")
+    print ("Using strategy " + LHD_SamplingStrategy + " for the LHS")
+    if (LHD_SamplingStrategy == "corr" or LHD_SamplingStrategy == "correlation"):
+        print ("with " + str(LHD_iterations) + " iterations \n")
     
     #Provide the LHD Matrix as raw
-    LHD_raw=pyDOE.lhs(LHD_factors, samples=LHD_SampleSize,criterion=LHD_SamplingStrategy,iterations=LHD_iterations)                      
-    #Normalise to values
+    if LHD_SamplingStrategy == "none" :
+        LHD_raw=pyDOE.lhs(LHD_factors, samples=LHD_SampleSize,iterations=LHD_iterations)
+    else:
+        LHD_raw=pyDOE.lhs(LHD_factors, samples=LHD_SampleSize,criterion=LHD_SamplingStrategy,iterations=LHD_iterations)                      
+    
+    #Print correlation matrix
+    a = np.corrcoef(LHD_raw)
+    print ("Correlation Matrix:")
+    print(a)
+        
+        #Normalise to values
     LHD_DPM=np.copy(LHD_raw)
     for row in range(LHD_SampleSize):
         LHD_col = 0
@@ -257,6 +272,7 @@ def main(argv):
     #Default Parameters
     DOE_Seed=42
     LHD_SampleSize=100
+    LHD_SamplingStrategy="corr"
     IDM_path = "input\\ExampleIDM.tsv"    
     DPM_path = "DOE\\DPM.tsv" #The Output matrix
     LHD_iterations=10
@@ -264,7 +280,7 @@ def main(argv):
 
     #Get the arguments    
     try:
-        opts, args = getopt.getopt(argv,"h:n:s:f:F:i:o:O:r:")
+        opts, args = getopt.getopt(argv,"f:F:h:i:l:n:N:o:O:r:s:")
     except getopt.GetoptError:
         print("\nERROR ERROR ERROR\n \t check arguments.\nERROR ERROR ERROR\n")
         #print(usage)
@@ -277,6 +293,8 @@ def main(argv):
             DOE_Seed = int(arg)
         elif opt in ("-n"):
             LHD_SampleSize = int(arg)
+        elif opt in ("-N"):
+            LHD_SampleSize = -float(arg)
         elif opt in ("-f"):
             IDM_path = str(arg)
         elif opt in ("-o"):
@@ -285,12 +303,14 @@ def main(argv):
             IDM_path = dir_path + "\\" + str(arg)
         elif opt in ("-O"):
             DPM_path = dir_path + "\\" + str(arg)
+        elif opt in ("-l"):
+            LHD_SamplingStrategy = str(arg)
         elif opt in ("-i"):
             LHD_iterations = int(arg)
         elif opt in ("-r"):
             RandomiseCFGs = str(arg)
       
-    DOE(DOE_Seed,LHD_SampleSize,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs);       
+    DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs);       
     
     return "Done"     
     
