@@ -31,6 +31,9 @@ USAGE = """ \
     -r: [Yes] Yes / No, specify if the factorial configurations shall be 
         randomly ordered in the output design matrix (a continuous config ID is
         preserved). Useful if computiational time of factorials varies.
+    -x: [0] Offest for the unique config ID. If, e.g., the set of configs shall
+        be appended later on. NOTE: Generating the complete set at once yealds
+        different results!
    
    
 All the information regarding the factors ("Parameters") is provided in a
@@ -93,7 +96,7 @@ import pyDOE #http://pythonhosted.org/pyDOE/randomized.html
 import csv as csv # to load the input file.
 
 
-def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs):
+def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs,Offset):
     np.random.seed(DOE_Seed) #fix
 
     print("STARTING\n")
@@ -244,7 +247,7 @@ def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_itera
     if (RandomiseCFGs == "Yes"):
         np.random.shuffle(DPM)
         for row in range(SampleSize):
-            DPM[row][0]=row+1
+            DPM[row][0]=row+1+Offset #Assign the unique configuration ids
 
         
     #Save everything to a tsv file.
@@ -282,10 +285,11 @@ def main(argv):
     DPM_path = "DOE\\DPM.tsv" #The Output matrix
     LHD_iterations=10
     RandomiseCFGs = "Yes"
+    Offset = 0
 
     #Get the arguments    
     try:
-        opts, args = getopt.getopt(argv,"f:F:h:i:l:n:N:o:O:r:s:")
+        opts, args = getopt.getopt(argv,"f:F:h:i:l:n:N:o:O:r:s:x:")
     except getopt.GetoptError:
         print("\nERROR ERROR ERROR\n \t check arguments.\nERROR ERROR ERROR\n")
         #print(usage)
@@ -314,8 +318,10 @@ def main(argv):
             LHD_iterations = int(arg)
         elif opt in ("-r"):
             RandomiseCFGs = str(arg)
+        elif opt in ("-x"):
+            Offset = int(arg)
       
-    DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs)
+    DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs, Offset)
     
     return "Done"     
     

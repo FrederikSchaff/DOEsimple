@@ -34,6 +34,10 @@ defaults are specified in [].
 in the output design matrix (a continuous config ID is preserved). Useful if 
 computiational time of factorials varies.
 
+-x: [0] Offest for the unique config ID. If, e.g., the set of configs shall
+be appended later on. NOTE: Generating the complete set at once yealds
+different results!
+
 ##Input File   
 All the information regarding the factors ("Parameters") is provided in a
 tab separeted file, the Input Design Matrix. An example is given with 
