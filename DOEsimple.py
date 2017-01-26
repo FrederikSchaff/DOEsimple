@@ -114,9 +114,7 @@ def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_itera
         IDM[row][1]=float(IDM[row][1])
         IDM[row][2]=float(IDM[row][2])
         IDM[row][3]=float(IDM[row][3])
-        
-    
-        
+                
     #Calculate the size of the full-factorial and the number of LHD parameters
     Indicator_DPM = [] #Hold information on the kind of the parameter in the final DPM
     Factorials = [] #Hold Factorial series, also that of FactPower
@@ -125,8 +123,15 @@ def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_itera
         Indicator_DPM.append(IDM[row][4])
         if IDM[row][4]=="LHD":
             LHD_factors+=1        
-        elif IDM[row][4]=="Factorial":
-            Factorials.append( [ IDM[row][0] , np.arange(IDM[row][1],IDM[row][2],IDM[row][3]) ] ) #parname, #items            
+        elif IDM[row][4]=="Factorial" or IDM[row][4]=="Fact" :
+            val = IDM[row][1]
+            tmp = [val]
+            while (val + IDM[row][2] <= IDM[row][3]):
+                val += IDM[row][2]
+                tmp.append(val)
+            tmp = np.asarray(tmp)
+            #tmp = np.arange(IDM[row][1],IDM[row][2],IDM[row][3])            
+            Factorials.append( [ IDM[row][0] , tmp ] ) #parname, #items            
         elif IDM[row][4]=="FactPower":
             tmp = []
             pw = int (0)
@@ -310,7 +315,7 @@ def main(argv):
         elif opt in ("-r"):
             RandomiseCFGs = str(arg)
       
-    DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs);       
+    DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs)
     
     return "Done"     
     
