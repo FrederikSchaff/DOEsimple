@@ -129,8 +129,8 @@ def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_itera
         elif IDM[row][4]=="Factorial" or IDM[row][4]=="Fact" :
             val = IDM[row][1]
             tmp = [val]
-            while (val + IDM[row][2] <= IDM[row][3]):
-                val += IDM[row][2]
+            while (val + IDM[row][3] <= IDM[row][2]):
+                val += IDM[row][3]
                 tmp.append(val)
             tmp = np.asarray(tmp)
             #tmp = np.arange(IDM[row][1],IDM[row][2],IDM[row][3])            
@@ -321,7 +321,7 @@ def main(argv):
         elif opt in ("-x"):
             Offset = int(arg)
       
-    DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs, Offset)
+    DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs,Offset)
     
     return "Done"     
     

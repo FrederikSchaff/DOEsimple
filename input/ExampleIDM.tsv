@@ -10,5 +10,5 @@ ABMAT_Max_t	2000	2000	0	Fixed	The number of days we run the simulation
 ABMAT_SeqMC_BCc	20	20	0	Fixed	The Besag-Clifford constant for the sequential Monte Carlo analysis
 ABMAT_SeqMC_Pv	0.05	0.05	0	Fixed	The P-Value for the sequential Monte Carlo analysis
 ABMAT_SeqMC_seed	1	2147483647	1	Random	The seed that is used for the sequential Monte Carlo analysis
-ABMAT_Window	-600	600	1201	Factorial	The size of the window that is covered for the stats and for the sequential Monte Carlo analysis
-ABMAT_Transient	-1	300	302	Factorial	The transient length analysed
+ABMAT_Window	-600	600	1200	Factorial	The size of the window that is covered for the stats and for the sequential Monte Carlo analysis
+ABMAT_Transient	-1	300	301	Factorial	The transient length analysed
