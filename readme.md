@@ -35,7 +35,7 @@ in the output design matrix (a continuous config ID is preserved). Useful if
 computiational time of factorials varies.
 
 -x: [0] Offest for the unique config ID. If, e.g., the set of configs shall
-be appended later on. NOTE: Generating the complete set at once yealds
+be appended later on. NOTE: Generating the complete set at once yields
 different results!
 
 ##Input File   

@@ -152,7 +152,7 @@ def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_itera
     FactSampleSize=1    
     for item in range(len(Factorials)):
         FactSampleSize*=Factorials[item][1].size
-    SampleSize =  int(LHD_SampleSize*FactSampleSize)   
+    SampleSize =  int(max(1,LHD_SampleSize)*FactSampleSize)   
     print ("Factorial design with ",len(Factorials), " factors and ", \
             FactSampleSize, "configurations.\n")
     print ("Latin Hyper Cube design with ", LHD_factors, " Factors and ",\
@@ -174,33 +174,34 @@ def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_itera
         loops*=Factorials[col][1].size #increase the number of repeated vals
                 
     #select sampling method for LHD part
-    print ("Using strategy " + LHD_SamplingStrategy + " for the LHS")
-    if (LHD_SamplingStrategy == "corr" or LHD_SamplingStrategy == "correlation"):
-        print ("with " + str(LHD_iterations) + " iterations \n")
-    
-    #Provide the LHD Matrix as raw
-    if LHD_SamplingStrategy == "none" :
-        LHD_raw=pyDOE.lhs(LHD_factors, samples=LHD_SampleSize,iterations=LHD_iterations)
-    else:
-        LHD_raw=pyDOE.lhs(LHD_factors, samples=LHD_SampleSize,criterion=LHD_SamplingStrategy,iterations=LHD_iterations)                      
-    
-    #Print correlation matrix
-    a = np.corrcoef(LHD_raw)
-    print ("Correlation Matrix:")
-    print(a)
+    if LHD_SampleSize > 0:
+        print ("Using strategy " + LHD_SamplingStrategy + " for the LHS")
+        if (LHD_SamplingStrategy == "corr" or LHD_SamplingStrategy == "correlation"):
+            print ("with " + str(LHD_iterations) + " iterations \n")
         
-        #Normalise to values
-    LHD_DPM=np.copy(LHD_raw)
-    for row in range(LHD_SampleSize):
-        LHD_col = 0
-        for col in range(len(Indicator_DPM)):
-            if Indicator_DPM[col]=="LHD":
-                LHD_DPM[row][LHD_col]*=(IDM[col][2]-IDM[col][1]) #spannwidth
-                LHD_DPM[row][LHD_col]+=IDM[col][1] #add minimum
-                #Now, correct to step-size
-                LHD_DPM[row][LHD_col]=round(LHD_DPM[row][LHD_col]/IDM[col][3])
-                LHD_DPM[row][LHD_col]*=IDM[col][3]
-                LHD_col+=1                          
+        #Provide the LHD Matrix as raw
+        if LHD_SamplingStrategy == "none" :
+            LHD_raw=pyDOE.lhs(LHD_factors, samples=LHD_SampleSize,iterations=LHD_iterations)
+        else:
+            LHD_raw=pyDOE.lhs(LHD_factors, samples=LHD_SampleSize,criterion=LHD_SamplingStrategy,iterations=LHD_iterations)                      
+    
+        #Print correlation matrix
+        a = np.corrcoef(LHD_raw)
+        print ("Correlation Matrix:")
+        print(a)
+            
+            #Normalise to values
+        LHD_DPM=np.copy(LHD_raw)
+        for row in range(LHD_SampleSize):
+            LHD_col = 0
+            for col in range(len(Indicator_DPM)):
+                if Indicator_DPM[col]=="LHD":
+                    LHD_DPM[row][LHD_col]*=(IDM[col][2]-IDM[col][1]) #spannwidth
+                    LHD_DPM[row][LHD_col]+=IDM[col][1] #add minimum
+                    #Now, correct to step-size
+                    LHD_DPM[row][LHD_col]=round(LHD_DPM[row][LHD_col]/IDM[col][3])
+                    LHD_DPM[row][LHD_col]*=IDM[col][3]
+                    LHD_col+=1                          
     
     #Provide a "Header" for the DPM with Parameter Names and ConfigID    
     DPM_header = [] #header
@@ -212,7 +213,7 @@ def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_itera
     #Define the complete Design Point Matrix, un-normalised, samples*(Pars+1)
     DPM=np.empty([SampleSize,len(DPM_header)],"float64")
     row=0
-    for LHD_row in range(LHD_SampleSize):
+    for LHD_row in range(max(LHD_SampleSize,1)):
         #loop through LHD and for each design-vector add the complete factorial 
         #sub-space
         for Fact_row in range(FactSampleSize):
