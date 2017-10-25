@@ -30,10 +30,11 @@ USAGE = """ \
     -O: Output Design Matrix, alternatively as relative path (to script loc)
     -r: [Yes] Yes / No, specify if the factorial configurations shall be 
         randomly ordered in the output design matrix (a continuous config ID is
-        preserved). Useful if computiational time of factorials varies.
+        preserved). Useful if computiational effort of factorials varies.
     -x: [0] Offest for the unique config ID. If, e.g., the set of configs shall
         be appended later on. NOTE: Generating the complete set at once yealds
         different results!
+....-I: Print info of configuration only, instead of creating it.
    
    
 All the information regarding the factors ("Parameters") is provided in a
@@ -96,7 +97,7 @@ import pyDOE #http://pythonhosted.org/pyDOE/randomized.html
 import csv as csv # to load the input file.
 
 
-def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs,Offset):
+def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs,Offset,InfoOnly):
     np.random.seed(DOE_Seed) #fix
 
     print("STARTING\n")
@@ -158,6 +159,10 @@ def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_itera
     print ("Latin Hyper Cube design with ", LHD_factors, " Factors and ",\
            LHD_SampleSize, " distinct design points for each\n")
     print("Overal sample size is: ", SampleSize)
+    
+    if (InfoOnly!=0):
+        print("\nExit. Info only mode.\n")
+        return "Done"
 
     #Create a reduced form design point matrix of the factorial factors.
     Fact_DPM = np.empty([FactSampleSize,len(Factorials)],"float64")
@@ -287,10 +292,11 @@ def main(argv):
     LHD_iterations=10
     RandomiseCFGs = "Yes"
     Offset = 0
+    InfoOnly = 0 #Only information on proposed Set. Not generation.
 
     #Get the arguments    
     try:
-        opts, args = getopt.getopt(argv,"f:F:h:i:l:n:N:o:O:r:s:x:")
+        opts, args = getopt.getopt(argv,"f:F:h:i:l:n:N:o:O:r:s:x:I:")
     except getopt.GetoptError:
         print("\nERROR ERROR ERROR\n \t check arguments.\nERROR ERROR ERROR\n")
         #print(usage)
@@ -321,8 +327,10 @@ def main(argv):
             RandomiseCFGs = str(arg)
         elif opt in ("-x"):
             Offset = int(arg)
+        elif opt in ("-I"):
+            InfoOnly = 1#int(arg)
       
-    DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs,Offset)
+    DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs,Offset,InfoOnly)
     
     return "Done"     
     
