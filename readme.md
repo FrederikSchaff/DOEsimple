@@ -26,22 +26,22 @@ defaults are specified in [].
 
 -F: Input Design Matrix, alternatively as relative path (to script loc)
 
--o: Output Design Matrix - Full Path
+-o: Output Design Matrix directory - Full Path
 
--O: Output Design Matrix, alternatively as relative path (to script loc)
+-O: Output Design Matrix directory, alternatively as relative path (to script loc)
 
--r: [Yes] Yes / No, specify if the factorial configurations shall be randomly ordered 
-in the output design matrix (a continuous config ID is preserved). Useful if 
-computiational time of factorials varies.
+-r: [Yes] Yes / No, specify if the factorial configurations shall be randomly ordered  in the output design matrix (a continuous config ID is preserved). Useful if  computiational time of factorials varies.
 
--x: [0] Offest for the unique config ID. If, e.g., the set of configs shall
-be appended later on. NOTE: Generating the complete set at once yields
-different results!
+-x: [0] Offest for the unique config ID. If, e.g., the set of configs shall be appended later on. NOTE: Generating the complete set at once yields different results!
+
+-I: [off] Print info of configuration only, instead of creating it. (any argument)
+
+-A: ["Yes"] Provide single (default) or aggregate ("any other input")  configuration files instead of a big one. Folder is "/Configs/" and files are "CID_1.tsv" for the first CID, etc.
+
+-t: [off] For testing, you may want to create only a small fraction of the  full set-up. Select a number (positive) of configurations randomly taken. In single file mode, these will be randomly fetched. In aggregate mode these will be consequtive.
 
 ##Input File   
-All the information regarding the factors ("Parameters") is provided in a
-tab separeted file, the Input Design Matrix. An example is given with 
-"input/ExampleIDM.tsv"
+All the information regarding the factors ("Parameters") is provided in a tab separeted file, the Input Design Matrix. An example is given with "input/ExampleIDM.tsv"
     
 The file follows the following structure (headers needed, without comments):
 
@@ -63,11 +63,13 @@ Comments:
 
 `10*10^0 , 10*10^1 , ... , 10*10^3`
     
-Output: A tab separeted (tsv) file holding a (M+1)x(N+1) matrix of the design 
-    of experiment, where:
-        M (rows) is the number of Configurations + a header line
-        N (columns) Is the number of parameters + a unique ConfigID
+Output: A tab separeted (tsv) file holding a (M+1)x(N+1) matrix of the design of experiment, where: 
+- M (rows) is the number of Configurations + a header line
+- N (columns) Is the number of parameters + a unique ConfigID
 
+The Outputfile is always of format:
+- [Single Files] "Out\DPM_Config_1.tsv"
+- [Aggregate]	"Out\DPM_Config.tsv"
 ###Example:
 
 ABMAT_ConfigID | Par1 | Par2  | Par3

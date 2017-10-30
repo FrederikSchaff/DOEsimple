@@ -24,18 +24,27 @@ USAGE = """ \
         Alternatives: c,m,cm or none
     -i: [10] Number of iterations for the LHD 
     -s: [42] initial seed for the DOE generation within python
-    -f: Input Design Matrix, see below (tab separeted file) - Full Path
-    -F: Input Design Matrix, alternatively as relative path (to script loc)
-    -o: Output Design Matrix - Full Path
-    -O: Output Design Matrix, alternatively as relative path (to script loc)
+    -C: ["Config"] The name of the config. If an aggregate Config is created, 
+        it is saved as "\Config_full.tsv", single ones are saved as 
+        "\Config_id.tsv" each. The folder is provided via -o/O
+    -f: Input Design Matrix file, see below (tab separeted file) - Full Path
+    -F: Input Design Matrix file, alternatively as relative path (to script loc)
+    -o: Output Design Matrix dir - Full Path
+    -O: ["DOE"]Output Design Matrix dir, alternatively as relative path (to script loc)
     -r: [Yes] Yes / No, specify if the factorial configurations shall be 
         randomly ordered in the output design matrix (a continuous config ID is
         preserved). Useful if computiational effort of factorials varies.
     -x: [0] Offest for the unique config ID. If, e.g., the set of configs shall
         be appended later on. NOTE: Generating the complete set at once yealds
         different results!
-....-I: Print info of configuration only, instead of creating it.
-   
+....-I: [off] Print info of configuration only, instead of creating it. (any argument)
+....-A: ["Yes"] Provide single (default) or aggregate ("any other input") 
+        configuration files instead of a big one. Folder is "/Configs/" and 
+        files are "CID_1.tsv" for the first CID, etc.
+    -t: [off] For testing, you may want to create only a small fraction of the 
+        full set-up. Select a number (positive) of configurations randomly 
+        taken. In single file mode, these will be randomly fetched. In 
+        aggregate mode these will be consequtive.
    
 All the information regarding the factors ("Parameters") is provided in a
     tab separeted file, the Input Design Matrix. 
@@ -60,10 +69,13 @@ Comments:
     [5] Factorial design, increment by powers of "Increment". In example:
         10*10^0,10*10^1,...,10*10^3.
     
-Output: A tab separeted (tsv) file holding a (M+1)x(N+1) matrix of the design 
-    of experiment, where:
-        M (rows) is the number of Configurations + a header line
-        N (columns) Is the number of parameters + a unique ConfigID
+Output: A tab separeted (tsv) file holding a (M+1)x(N+1) matrix of the design of experiment, where: 
+- M (rows) is the number of Configurations + a header line
+- N (columns) Is the number of parameters + a unique ConfigID
+
+The Outputfile is always of format:
+- [Single Files] "DOE\DPM_Config_1.tsv"
+- [Aggregate]	"DOE\DPM_Config.tsv"
 
 Example:
 +----------------+------+-------+------+
@@ -88,6 +100,7 @@ for information on this.
 
 """Import Libraries"""
 import numpy as np
+import random as random
 import os
 import getopt
 #dir_path = os.path.dirname(os.path.realpath(__file__)) #get dir of file
@@ -97,7 +110,7 @@ import pyDOE #http://pythonhosted.org/pyDOE/randomized.html
 import csv as csv # to load the input file.
 
 
-def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs,Offset,InfoOnly):
+def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs,Offset,InfoOnly,make_single_files,DPM_base_name,test_mode):
     np.random.seed(DOE_Seed) #fix
 
     print("STARTING\n")
@@ -254,29 +267,37 @@ def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_itera
         np.random.shuffle(DPM)
         for row in range(SampleSize):
             DPM[row][0]=row+1+Offset #Assign the unique configuration ids
-
-        
-    #Save everything to a tsv file.
-    os.makedirs(os.path.dirname(DPM_path), exist_ok=True) #Create dir if necessary
-    DPM_f = open(DPM_path, 'w',encoding='utf-8',newline='')    
-    csvWriter = csv.writer(DPM_f, delimiter = "\t")
-    csvWriter.writerow(DPM_header)    
-    for row in range(SampleSize):
-        csvWriter.writerow(DPM[row])
-    DPM_f.close()   
-    
+            
     """
     Save the DPM to a tab-separated file
     """
-       
+    
+    os.makedirs(os.path.dirname(DPM_path+"\\"), exist_ok=True) #Create dir if necessary
+    sample = range(SampleSize)
+    if (not make_single_files):
         #Save everything to a tsv file.
-    DPM_f = open(DPM_path, 'w',encoding='utf-8',newline='')    
-    csvWriter = csv.writer(DPM_f, delimiter = "\t")
-    csvWriter.writerow(DPM_header)    
-    for row in range(SampleSize):
-        csvWriter.writerow(DPM[row])
-    DPM_f.close()
-
+        out_file = DPM_path + "\\DPM_" + DPM_base_name + ".tsv"         
+        DPM_f = open(out_file, 'w',encoding='utf-8',newline='')    
+        csvWriter = csv.writer(DPM_f, delimiter = "\t")
+        csvWriter.writerow(DPM_header)
+        if test_mode>0 and test_mode < SampleSize:            
+            sample = range(test_mode)
+        for row in sample:
+            csvWriter.writerow(DPM[row])
+        DPM_f.close()
+    else:
+        #create single tsv files        for row in range(SampleSize):        
+        if test_mode>0 and test_mode < SampleSize:
+            sample = random.sample(sample, test_mode)
+            print(sample)
+        for row in sample:
+            out_file = DPM_path + "\\DPM_" + DPM_base_name + "_" + str(int(DPM[row][0])) + ".tsv"         
+            DPM_f = open(out_file, 'w',encoding='utf-8',newline='')    
+            csvWriter = csv.writer(DPM_f, delimiter = "\t")
+            csvWriter.writerow(DPM_header)    
+            csvWriter.writerow(DPM[row])
+            DPM_f.close()
+   
     return "DoneA" 
 
 """ The main program"""
@@ -287,16 +308,19 @@ def main(argv):
     DOE_Seed=42
     LHD_SampleSize=100
     LHD_SamplingStrategy="corr"
-    IDM_path = "input\\ExampleIDM.tsv"    
-    DPM_path = "DOE\\DPM.tsv" #The Output matrix
+    IDM_path = "input\\ExampleIDM.tsv"    #windows format..
+    DPM_path = "DOE" #The Output matrix folder
+    DPM_base_name ="Config"
     LHD_iterations=10
     RandomiseCFGs = "Yes"
     Offset = 0
     InfoOnly = 0 #Only information on proposed Set. Not generation.
+    make_single_files = True
+    test_mode = 0 #off
 
     #Get the arguments    
     try:
-        opts, args = getopt.getopt(argv,"f:F:h:i:l:n:N:o:O:r:s:x:I:")
+        opts, args = getopt.getopt(argv,"f:F:h:i:l:n:N:o:O:r:s:x:I:A:C:t:")
     except getopt.GetoptError:
         print("\nERROR ERROR ERROR\n \t check arguments.\nERROR ERROR ERROR\n")
         #print(usage)
@@ -327,11 +351,17 @@ def main(argv):
             RandomiseCFGs = str(arg)
         elif opt in ("-x"):
             Offset = int(arg)
+        elif opt in ("-t"):
+            test_mode = int(arg)
         elif opt in ("-I"):
             InfoOnly = 1#int(arg)
+        elif opt in ("-A"):
+            if str(arg) != "Yes":
+                make_single_files = False
+        elif opt in ("-C"):
+            DPM_base_name = str(arg)
       
-    DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs,Offset,InfoOnly)
-    
+    DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_iterations,RandomiseCFGs,Offset,InfoOnly,make_single_files,DPM_base_name,test_mode)    
     return "Done"     
     
     
