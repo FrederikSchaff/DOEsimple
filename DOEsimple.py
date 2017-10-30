@@ -315,7 +315,7 @@ def main(argv):
     RandomiseCFGs = "Yes"
     Offset = 0
     InfoOnly = 0 #Only information on proposed Set. Not generation.
-    make_single_files = True
+    make_single_files = False
     test_mode = 0 #off
 
     #Get the arguments    
@@ -357,7 +357,7 @@ def main(argv):
             InfoOnly = 1#int(arg)
         elif opt in ("-A"):
             if str(arg) != "Yes":
-                make_single_files = False
+                make_single_files = True
         elif opt in ("-C"):
             DPM_base_name = str(arg)
       
