@@ -58,7 +58,7 @@ Comments:
     [1] A random integer value in [10,10000], selected via Latin Hyper Cube D.
     [2] Factorial design, {0.01,0.21,0.41,...,0.91}                                
     [3] A random integer value in [1,2147483647], selected randomly (not LHD)
-    [4] Fixed to min+incr, here: 0.5
+    [4] Fixed to min, here: 0.1
     [5] Factorial design, increment by powers of "Increment". In the example:
 
 `10*10^0 , 10*10^1 , ... , 10*10^3`

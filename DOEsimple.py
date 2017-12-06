@@ -38,9 +38,8 @@ USAGE = """ \
         be appended later on. NOTE: Generating the complete set at once yealds
         different results!
 ....-I: [off] Print info of configuration only, instead of creating it. (any argument)
-....-A: ["Yes"] Provide single (default) or aggregate ("any other input") 
-        configuration files instead of a big one. Folder is "/Configs/" and 
-        files are "CID_1.tsv" for the first CID, etc.
+....-A: ["Yes"] Provide aggregate (default) or individual ("any other input") 
+        configuration file(s) instead of a big one.
     -t: [off] For testing, you may want to create only a small fraction of the 
         full set-up. Select a number (positive) of configurations randomly 
         taken. In single file mode, these will be randomly fetched. In 
@@ -65,7 +64,7 @@ Comments:
     [1] A random integer value in [10,10000], selected via Latin Hyper Cube D.
     [2] Factorial design, {0.01,0.21,0.41,...,0.91}                           
     [3] A random integer value in [1,2147483647], selected randomly (not LHD)
-    [4] Fixed to min+incr, here: 0.5
+    [4] Fixed to min, here: 0.5
     [5] Factorial design, increment by powers of "Increment". In example:
         10*10^0,10*10^1,...,10*10^3.
     
@@ -172,6 +171,9 @@ def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_itera
     print ("Latin Hyper Cube design with ", LHD_factors, " Factors and ",\
            LHD_SampleSize, " distinct design points for each\n")
     print("Overal sample size is: ", SampleSize)
+    if test_mode>0 and test_mode < SampleSize:            
+        print("\nTest mode selected. Sample Size is now:",test_mode)
+
     
     if (InfoOnly!=0):
         print("\nExit. Info only mode.\n")
@@ -247,7 +249,7 @@ def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_itera
                     DPM[row][col]=Fact_DPM[Fact_row][Fact_item]
                     Fact_item+=1
                 elif Indicator_DPM[col]=="Fixed":
-                    DPM[row][col]=IDM[col-1][1]+IDM[col-1][3] #Minimum + Increment
+                    DPM[row][col]=IDM[col-1][1] #Minimum
                 elif Indicator_DPM[col]=="Random":
                     DPM[row][col]=IDM[col-1][2]-IDM[col-1][1] #Span
                     DPM[row][col]*=np.random.uniform() #randomise
@@ -322,7 +324,9 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv,"f:F:h:i:l:n:N:o:O:r:s:x:I:A:C:t:")
     except getopt.GetoptError:
-        print("\nERROR ERROR ERROR\n \t check arguments.\nERROR ERROR ERROR\n")
+        print("\nERROR ERROR ERROR\n \t check arguments.\n")
+        print(USAGE)
+        print("\n\n")
         #print(usage)
         os.sys.exit(2)
     for opt, arg in opts:
