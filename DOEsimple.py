@@ -64,7 +64,7 @@ Comments:
     [1] A random integer value in [10,10000], selected via Latin Hyper Cube D.
     [2] Factorial design, {0.01,0.21,0.41,...,0.91}                           
     [3] A random integer value in [1,2147483647], selected randomly (not LHD)
-    [4] Fixed to min, here: 0.5
+    [4] Fixed to min, here: 0.1
     [5] Factorial design, increment by powers of "Increment". In example:
         10*10^0,10*10^1,...,10*10^3.
     
@@ -157,7 +157,9 @@ def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_itera
             Factorials.append( [IDM[row][0], np.asarray(tmp)] ) #parname, #items                
 
     #Calculate the size of the LHD sample part
-    if LHD_SampleSize < 0:
+    if LHD_factors==0:
+        LHD_SampleSize=0
+    elif LHD_SampleSize < 0: #implies -N argument
         LHD_SampleSize*=-LHD_factors
         LHD_SampleSize = round(LHD_SampleSize)
         
@@ -166,9 +168,11 @@ def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_itera
     for item in range(len(Factorials)):
         FactSampleSize*=Factorials[item][1].size
     SampleSize =  int(max(1,LHD_SampleSize)*FactSampleSize)   
-    print ("Factorial design with ",len(Factorials), " factors and ", \
+    if len(Factorials)>0:
+        print ("Factorial design with ",len(Factorials), " factors and ", \
             FactSampleSize, "configurations.\n")
-    print ("Latin Hyper Cube design with ", LHD_factors, " Factors and ",\
+    if LHD_factors>0:
+        print ("Latin Hyper Cube design with ", LHD_factors, " Factors and ",\
            LHD_SampleSize, " distinct design points for each\n")
     print("Overal sample size is: ", SampleSize)
     if test_mode>0 and test_mode < SampleSize:            
