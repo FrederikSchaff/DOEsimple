@@ -8,6 +8,8 @@ is used.
 For the latin hyper cube, the optimisation approach can be specified (deault: correlation), 
 alongside with the number of iterations. See [PyDOE](https://github.com/tisimst/pyDOE) for more information.
 
+(to install pydoe with conda: `conda install -c conda-forge pydoe ` )
+
 ##Usage
 You can call the program via command line, using the following arguments, the 
 defaults are specified in [].
@@ -69,7 +71,7 @@ Output: A tab separeted (tsv) file holding a (M+1)x(N+1) matrix of the design of
 
 The Outputfile is always of format:
 - [Single Files] "Out\DPM_Config_1.tsv"
-- [Aggregate]	"Out\DPM_Config.tsv"
+	 [Aggregate]	"Out\DPM_Config.tsv"
 ###Example:
 
 ABMAT_ConfigID | Par1 | Par2  | Par3

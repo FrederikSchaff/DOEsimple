@@ -157,8 +157,16 @@ def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_itera
             Factorials.append( [IDM[row][0], np.asarray(tmp)] ) #parname, #items                
 
     #Calculate the size of the LHD sample part
+    SampleMult=1
     if LHD_factors==0:
+        if (LHD_SampleSize<0):
+            SampleMult = round(-LHD_SampleSize) #use as multiplicator            
         LHD_SampleSize=0
+    elif LHD_factors==1:
+        print ("It is not possible to have a single LHD factor.\n")
+        print ("Instead, consider to make it 'Fact' and add -N 20 (example) \
+               to multiply the complete setting by 20.")
+        return "ERROR"
     elif LHD_SampleSize < 0: #implies -N argument
         LHD_SampleSize*=-LHD_factors
         LHD_SampleSize = round(LHD_SampleSize)
@@ -174,10 +182,12 @@ def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_itera
     if LHD_factors>0:
         print ("Latin Hyper Cube design with ", LHD_factors, " Factors and ",\
            LHD_SampleSize, " distinct design points for each\n")
-    print("Overal sample size is: ", SampleSize)
+    if SampleMult>1:
+        print("All is multiplied by ", SampleMult, ". \nNote: This makes only", \
+              "sense if at least one random factor exists (like seed)\n")
     if test_mode>0 and test_mode < SampleSize:            
         print("\nTest mode selected. Sample Size is now:",test_mode)
-
+    print("Overal sample size is: ", SampleSize*SampleMult)
     
     if (InfoOnly!=0):
         print("\nExit. Info only mode.\n")
@@ -235,36 +245,37 @@ def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_itera
     Indicator_DPM.insert(0,"ID")
     
     #Define the complete Design Point Matrix, un-normalised, samples*(Pars+1)
-    DPM=np.empty([SampleSize,len(DPM_header)],"float64")
+    DPM=np.empty([SampleSize*SampleMult,len(DPM_header)],"float64")
     row=0
-    for LHD_row in range(max(LHD_SampleSize,1)):
-        #loop through LHD and for each design-vector add the complete factorial 
-        #sub-space
-        for Fact_row in range(FactSampleSize):
-            LHD_item=0            
-            Fact_item=0
-            for col in range(len(Indicator_DPM)):
-                if Indicator_DPM[col]=="ID":
-                    DPM[row][col]=row+1 #Set the ConfigID, starting with 1#
-                elif Indicator_DPM[col]=="LHD":
-                    DPM[row][col]=LHD_DPM[LHD_row][LHD_item]
-                    LHD_item+=1
-                elif Indicator_DPM[col]=="Factorial" or Indicator_DPM[col]=="FactPower":
-                    DPM[row][col]=Fact_DPM[Fact_row][Fact_item]
-                    Fact_item+=1
-                elif Indicator_DPM[col]=="Fixed":
-                    DPM[row][col]=IDM[col-1][1] #Minimum
-                elif Indicator_DPM[col]=="Random":
-                    DPM[row][col]=IDM[col-1][2]-IDM[col-1][1] #Span
-                    DPM[row][col]*=np.random.uniform() #randomise
-                    DPM[row][col]+=IDM[col-1][1] #add minimum
-                    #Now, correct to step-size
-                    DPM[row][col]=round(DPM[row][col]*IDM[col-1][3])
-                    DPM[row][col]/=IDM[col-1][3]
-                else:
-                    print("Error! Unknown Type of Variable: ", \
-                          Indicator_DPM[col] )
-            row+=1
+    for mult in range(SampleMult): #multiply                 
+        for LHD_row in range(max(LHD_SampleSize,1)):
+            #loop through LHD and for each design-vector add the complete factorial 
+            #sub-space
+            for Fact_row in range(FactSampleSize):
+                LHD_item=0            
+                Fact_item=0
+                for col in range(len(Indicator_DPM)):
+                    if Indicator_DPM[col]=="ID":
+                        DPM[row][col]=row+1 #Set the ConfigID, starting with 1#
+                    elif Indicator_DPM[col]=="LHD":
+                        DPM[row][col]=LHD_DPM[LHD_row][LHD_item]
+                        LHD_item+=1
+                    elif Indicator_DPM[col]=="Factorial" or Indicator_DPM[col]=="FactPower":
+                        DPM[row][col]=Fact_DPM[Fact_row][Fact_item]
+                        Fact_item+=1
+                    elif Indicator_DPM[col]=="Fixed":
+                        DPM[row][col]=IDM[col-1][1] #Minimum
+                    elif Indicator_DPM[col]=="Random":
+                        DPM[row][col]=IDM[col-1][2]-IDM[col-1][1] #Span
+                        DPM[row][col]*=np.random.uniform() #randomise
+                        DPM[row][col]+=IDM[col-1][1] #add minimum
+                        #Now, correct to step-size
+                        DPM[row][col]=round(DPM[row][col]*IDM[col-1][3])
+                        DPM[row][col]/=IDM[col-1][3]
+                    else:
+                        print("Error! Unknown Type of Variable: ", \
+                              Indicator_DPM[col] )
+                row+=1
     
     #mix the order? Is espescially important in case of distributed "packages"
     #of simulations and factorial designs, where the simulation time may vary 
