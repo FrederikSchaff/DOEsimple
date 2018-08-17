@@ -290,7 +290,7 @@ def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_itera
     """
     
     os.makedirs(os.path.dirname(DPM_path+"\\"), exist_ok=True) #Create dir if necessary
-    sample = range(SampleSize)
+    sample = range(SampleSize*SampleMult)
     if (not make_single_files):
         #Save everything to a tsv file.
         out_file = DPM_path + "\\DPM_" + DPM_base_name + ".tsv"         
