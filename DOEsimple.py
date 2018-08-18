@@ -282,7 +282,7 @@ def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_itera
     #with the factorial's values. E.g. scale parameters.
     if (RandomiseCFGs == "Yes"):
         np.random.shuffle(DPM)
-        for row in range(SampleSize):
+        for row in range(SampleSize*SampleMult):
             DPM[row][0]=row+1+Offset #Assign the unique configuration ids
             
     """
@@ -297,14 +297,14 @@ def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_itera
         DPM_f = open(out_file, 'w',encoding='utf-8',newline='')    
         csvWriter = csv.writer(DPM_f, delimiter = "\t")
         csvWriter.writerow(DPM_header)
-        if test_mode>0 and test_mode < SampleSize:            
+        if test_mode>0 and test_mode < SampleSize*SampleMult:            
             sample = range(test_mode)
         for row in sample:
             csvWriter.writerow(DPM[row])
         DPM_f.close()
     else:
         #create single tsv files        for row in range(SampleSize):        
-        if test_mode>0 and test_mode < SampleSize:
+        if test_mode>0 and test_mode < SampleSize * SampleMult:
             sample = random.sample(sample, test_mode)
             print(sample)
         for row in sample:
