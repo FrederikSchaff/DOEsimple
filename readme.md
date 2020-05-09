@@ -1,4 +1,4 @@
-#DOEsimple
+# DOEsimple
 A "simple" Python 3 file to create a Design of Experiment (DOE) Design Point 
 Matrix (DPM), potentially mixed from latin hyper cube, simple randomisation 
 (appropriate for seeds, e.g.), factorial designs (including power) and also 
@@ -10,7 +10,7 @@ alongside with the number of iterations. See [PyDOE](https://github.com/tisimst/
 
 (to install pydoe with conda: `conda install -c conda-forge pydoe ` )
 
-##Usage
+## Usage
 You can call the program via command line, using the following arguments, the 
 defaults are specified in [].
 
@@ -72,7 +72,7 @@ Output: A tab separeted (tsv) file holding a (M+1)x(N+1) matrix of the design of
 The Outputfile is always of format:
 - [Single Files] "Out\DPM_Config_1.tsv"
 	 [Aggregate]	"Out\DPM_Config.tsv"
-###Example:
+### Example:
 
 ABMAT_ConfigID | Par1 | Par2  | Par3
 ---|---|---|---
@@ -82,7 +82,7 @@ ABMAT_ConfigID | Par1 | Par2  | Par3
 
 **An example *.batch file for Windows clients (python 3 installed) is attached.**
 
-##Workings:
+## Workings:
 Simple Random Values are drawn new each time for each configuration.
 LHD Factors are drawn once at the beginning, using the pyDOE library. The 
 default strategy is to use "corr" option, which minimises the maximum absolute
@@ -91,7 +91,7 @@ correlation between vectors. Alternatively, if LHD_SampleSize/LHD_factors > 30,
 If additional Factorial Design is used, the LHD Matrix is multiplied as needed
 for the factorial design.
 
-##Advancements and NO warranty
+## Advancements and NO warranty
 If someone uses the file and has a good idea regarding and advancement, etc., feel free to do so! 
 I intended it for personal use but thought I might as well share it, therefore it is provided "as-is"
 without any warranty or whatsoever.
