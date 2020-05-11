@@ -87,12 +87,12 @@ Example:
 
 Workings:
 Random Values are drawn new each time for each configuration.
-LHD Factors are drawn once at the beginning, using the pyDOE library.
+LHD Factors are drawn once at the beginning, using the pyDOE2 library.
 If additional Factorial Design is used, the LHD Matrix is multiplied as needed
 for the factorial design.  
 
 Potential "upgrades":
-Provide opportunity to use specific distributions for the LHD. See pyDOE page
+Provide opportunity to use specific distributions for the LHD. See pyDOE2 page
 for information on this.
       
 """
@@ -105,7 +105,7 @@ import getopt
 #dir_path = os.path.dirname(os.path.realpath(__file__)) #get dir of file
 dir_path =os.getcwd() #get dir of file, if __file__ makes problems
 #from tabulate import tabulate #https://pypi.python.org/pypi/tabulate - to make nice tables
-import pyDOE #http://pythonhosted.org/pyDOE/randomized.html
+import pyDOE2 #https://github.com/clicumu/pyDOE2
 import csv as csv # to load the input file.
 
 
@@ -215,9 +215,9 @@ def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_itera
         
         #Provide the LHD Matrix as raw
         if LHD_SamplingStrategy == "none" :
-            LHD_raw=pyDOE.lhs(LHD_factors, samples=LHD_SampleSize,iterations=LHD_iterations)
+            LHD_raw=pyDOE2.lhs(LHD_factors, samples=LHD_SampleSize,iterations=LHD_iterations)
         else:
-            LHD_raw=pyDOE.lhs(LHD_factors, samples=LHD_SampleSize,criterion=LHD_SamplingStrategy,iterations=LHD_iterations)                      
+            LHD_raw=pyDOE2.lhs(LHD_factors, samples=LHD_SampleSize,criterion=LHD_SamplingStrategy,iterations=LHD_iterations)                      
     
         #Print correlation matrix
         a = np.corrcoef(LHD_raw)
@@ -325,7 +325,7 @@ def main(argv):
     DOE_Seed=42
     LHD_SampleSize=100
     LHD_SamplingStrategy="corr"
-    IDM_path = "input\\ExampleIDM.tsv"    #windows format..
+    IDM_path = "IDM_Example.tsv"    #windows format..
     DPM_path = "DOE" #The Output matrix folder
     DPM_base_name ="Config"
     LHD_iterations=10
