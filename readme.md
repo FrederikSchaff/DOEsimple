@@ -2,15 +2,19 @@
 A "simple" Python 3 file to create a Design of Experiment (DOE) Design Point 
 Matrix (DPM), potentially mixed from latin hyper cube, simple randomisation 
 (appropriate for seeds, e.g.), factorial designs (including power) and also 
-fixed values. For latin hyper cube designs the [PyDOE](https://github.com/tisimst/pyDOE) library
-is used.
+fixed values. For latin hyper cube designs the [PyDOE2](https://github.com/clicumu/pyDOE2) library is used.
 
 For the latin hyper cube, the optimisation approach can be specified (deault: correlation), 
-alongside with the number of iterations. See [PyDOE](https://github.com/tisimst/pyDOE) for more information.
+alongside with the number of iterations. See [PyDOE2](https://github.com/clicumu/pyDOE2) for more information.
 
-(to install pydoe with conda: `conda install -c conda-forge pydoe ` )
+Install pydoe2 with conda: `conda install -c conda-forge pydoe2 `, with pip: `pip install pydoe2`
 
-## Usage
+*Contributions are welcome. Just open a pull request or contact me.*
+
+## Changelist
+- 2020-05 : Updated to PyDOE2
+
+# Usage
 You can call the program via command line, using the following arguments, the 
 defaults are specified in [].
 
@@ -47,21 +51,21 @@ All the information regarding the factors ("Parameters") is provided in a tab se
     
 The file follows the following structure (headers needed, without comments):
 
- Parameter | Minimum |  Maximum   | Increment |   Type | Comment  
----|---|---|---|---|---
- n_Agents  |  10 |  10000 | 1 | LHD  | [1]   
- p_crowded |0.01 |.99 |   0.2 | Factorial| [2]
- seed  |   1 | 2147483647 | 1 | Random   | [3]
- Lambda| 0.1 |0.9 |   0.4 | Fixed| [4]
- beta  |  10 |  10000 |10 | FactPower| [5]
+ | Parameter | Minimum | Maximum    | Increment | Type      | Comment |
+ | --------- | ------- | ---------- | --------- | --------- | ------- |
+ | n_Agents  | 10      | 10000      | 1         | LHD       | [1]     |
+ | p_crowded | 0.01    | .99        | 0.2       | Factorial | [2]     |
+ | seed      | 1       | 2147483647 | 1         | Random    | [3]     |
+ | Lambda    | 0.1     | 0.9        | 0.4       | Fixed     | [4]     |
+ | beta      | 10      | 10000      | 10        | FactPower | [5]     |
 
 
 Comments:
-    [1] A random integer value in [10,10000], selected via Latin Hyper Cube D.
-    [2] Factorial design, {0.01,0.21,0.41,...,0.91}                                
-    [3] A random integer value in [1,2147483647], selected randomly (not LHD)
-    [4] Fixed to min, here: 0.1
-    [5] Factorial design, increment by powers of "Increment". In the example:
+  [1] A random integer value in [10,10000], selected via Latin Hyper Cube D.
+  [2] Factorial design, {0.01,0.21,0.41,...,0.91}                                
+  [3] A random integer value in [1,2147483647], selected randomly (not LHD)
+  [4] Fixed to min, here: 0.1
+  [5] Factorial design, increment by powers of "Increment". In the example:
 
 `10*10^0 , 10*10^1 , ... , 10*10^3`
     
@@ -70,24 +74,25 @@ Output: A tab separeted (tsv) file holding a (M+1)x(N+1) matrix of the design of
 - N (columns) Is the number of parameters + a unique ConfigID
 
 The Outputfile is always of format:
-- [Single Files] "Out\DPM_Config_1.tsv"
-	 [Aggregate]	"Out\DPM_Config.tsv"
+- [Single Files] "Out/DPM_Config_1.tsv", "Out/DPM_Config_2.tsv", ...
+- [Aggregate]	 "Out/DPM_Config.tsv"
+
 ### Example:
 
-ABMAT_ConfigID | Par1 | Par2  | Par3
----|---|---|---
-1 |   .3 | .3    | 10.0
-2 |   .2 | .2e-3 |  0.1
-3 |   .4 | .2    |  9.9
+| ABMAT_ConfigID | Par1 | Par2  | Par3 |
+| -------------- | ---- | ----- | ---- |
+| 1              | .3   | .3    | 10.0 |
+| 2              | .2   | .2e-3 | 0.1  |
+| 3              | .4   | .2    | 9.9  |
 
-**An example *.batch file for Windows clients (python 3 installed) is attached.**
+**An example *.bat file for Windows clients (python 3 installed and executable added to Path) is attached.**
 
 ## Workings:
 Simple Random Values are drawn new each time for each configuration.
 LHD Factors are drawn once at the beginning, using the pyDOE library. The 
 default strategy is to use "corr" option, which minimises the maximum absolute
 correlation between vectors. Alternatively, if LHD_SampleSize/LHD_factors > 30,
-"centermaximin" is chosen. See the [PyDOE](https://github.com/tisimst/pyDOE) description for more information.
+"centermaximin" is chosen. See the [PyDOE2](https://github.com/clicumu/pyDOE2) description for more information.
 If additional Factorial Design is used, the LHD Matrix is multiplied as needed
 for the factorial design.
 

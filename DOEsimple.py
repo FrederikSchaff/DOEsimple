@@ -2,7 +2,7 @@
 """
 Created on 02.11.2016 17:52:18
 
-@author: Frederik.Schaff@FernUni-Hagen.de
+@author: Frederik.Schaff@thinkcomplex.eu
 
 A "simple" Python script to create a Design of Experiment (DOE) Design Point 
 Matrix (DPM), potentially mixed from latin hyper cube, simple randomisation 
@@ -19,7 +19,7 @@ USAGE = """ \
     optional arguments with the command line. Default in []
     -n: [10] LHD Sample Size (total, integer). Alternatively:
     -N: [1] LHD Sample Size equal to multiple of factors (rounded)
-             Note: Sample Size is n*{} {Size of Factorial Design}
+             Note: Sample Size Note: Sample Size is n*{Size of Factorial Design}
     -l: The kind of optimisation for the lhs (default: corr). 
         Alternatives: c,m,cm or none
     -i: [10] Number of iterations for the LHD 
@@ -73,8 +73,8 @@ Output: A tab separeted (tsv) file holding a (M+1)x(N+1) matrix of the design of
 - N (columns) Is the number of parameters + a unique ConfigID
 
 The Outputfile is always of format:
-- [Single Files] "DOE\DPM_Config_1.tsv"
-- [Aggregate]	"DOE\DPM_Config.tsv"
+- [Single Files] "DOE/DPM_Config_1.tsv"
+- [Aggregate]	"DOE/DPM_Config.tsv"
 
 Example:
 +----------------+------+-------+------+
