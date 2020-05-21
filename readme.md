@@ -69,6 +69,8 @@ Comments:
 
 `10*10^0 , 10*10^1 , ... , 10*10^3`
     
+_NOTE: If you provide negative numbers, the minimum still needs to be the minimum and the increment needs to be positive._
+
 Output: A tab separeted (tsv) file holding a (M+1)x(N+1) matrix of the design of experiment, where: 
 - M (rows) is the number of Configurations + a header line
 - N (columns) Is the number of parameters + a unique ConfigID

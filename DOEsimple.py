@@ -298,7 +298,7 @@ def DOE(DOE_Seed,LHD_SampleSize,LHD_SamplingStrategy,IDM_path,DPM_path,LHD_itera
         csvWriter = csv.writer(DPM_f, delimiter = "\t")
         csvWriter.writerow(DPM_header)
         if test_mode>0 and test_mode < SampleSize*SampleMult:            
-            sample = range(test_mode)
+            sample = random.sample(sample, test_mode)
         for row in sample:
             csvWriter.writerow(DPM[row])
         DPM_f.close()
